@@ -156,7 +156,7 @@ async fn main() -> std::io::Result<()> {
     pretty_env_logger::init();
     match dotenv(){
         Ok(_) => {}
-        Err(e) => {
+        Err(_e) => {
             log::warn!("No .env var found !")
         }
     }
