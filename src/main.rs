@@ -13,7 +13,6 @@ use serde::Serialize;
 use std::env;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
-use std::path::PathBuf;
 
 type WorkerId = u16;
 type Timestamp = u64;
