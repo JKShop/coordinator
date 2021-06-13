@@ -79,6 +79,9 @@ steps:
     depends_on:
       - docker
       - rebuild-target-cache
+    environment:
+      password:
+        from_secret: docker_username
 
 volumes:
   - name: cache
