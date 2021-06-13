@@ -7,12 +7,13 @@
 
 use actix_web::web::Json;
 use actix_web::{web, App, HttpServer};
-use dotenv::dotenv;
+use dotenv::{dotenv, Error};
 use once_cell::sync::Lazy;
 use serde::Serialize;
 use std::env;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
+use std::path::PathBuf;
 
 type WorkerId = u16;
 type Timestamp = u64;
@@ -154,7 +155,12 @@ async fn get_id() -> Result<Json<Response>, ()> {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     pretty_env_logger::init();
-    dotenv().expect("Couldn't load env variables !");
+    match dotenv(){
+        Ok(_) => {}
+        Err(e) => {
+            log::warn!("No .env var found !")
+        }
+    }
     {
         let mut worker_status = WORKER_STATUS
             .lock()
