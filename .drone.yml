@@ -81,7 +81,7 @@ steps:
       - rebuild-target-cache
     environment:
       password:
-        from_secret: docker_username
+        from_secret: password
 
 volumes:
   - name: cache
