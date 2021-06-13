@@ -8,6 +8,7 @@ URL = "http://185.228.136.146:9000/api"
 JWT_TOKEN = ""
 
 
+
 def login():
     global JWT_TOKEN
     login_payload = {'username': 'admin',
