@@ -127,7 +127,6 @@ async fn get_id() -> Result<Json<Response>, ()> {
             .filter(|f| f.status == STATUS::Unused)
             .collect::<Vec<&Worker>>()
             .pop()
-            .clone()
     };
     match id {
         None => Err(()),
