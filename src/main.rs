@@ -5,24 +5,24 @@ use serde::Serialize;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-type WORKER = u16;
-type TIMESTAMP = u64;
+type Worker = u16;
+type Timestamp = u64;
 const REREG_TIME: u64 = 10;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 enum STATUS {
-    UNUSED,
-    INUSE,
+    Unused,
+    Inuse,
 }
 
 #[derive(Serialize)]
 struct Response {
-    id: WORKER,
-    ts: TIMESTAMP,
-    re_ts: TIMESTAMP,
+    id: Worker,
+    ts: Timestamp,
+    re_ts: Timestamp,
 }
 
-static WORKER_STATUS: Lazy<Mutex<Vec<(WORKER, STATUS, TIMESTAMP)>>> =
+static WORKER_STATUS: Lazy<Mutex<Vec<(Worker, STATUS, Timestamp)>>> =
     Lazy::new(|| Mutex::new(Vec::with_capacity(u16::MAX as usize)));
 
 async fn get_id() -> Result<Json<Response>, ()> {
@@ -37,20 +37,20 @@ async fn get_id() -> Result<Json<Response>, ()> {
         worker_status
             .iter()
             .filter(|f| f.2 + REREG_TIME < time && f.2 != 0)
-            .map(|m| (m.0.clone(), m.1.clone(), m.2.clone()))
-            .collect::<Vec<(WORKER, STATUS, TIMESTAMP)>>()
+            .map(|m| (m.0, m.1, m.2))
+            .collect::<Vec<(Worker, STATUS, Timestamp)>>()
     };
 
     for od in outdated {
         let idx = { worker_status.iter().position(|f| f == &od).unwrap() };
-        worker_status[idx] = (od.0, STATUS::UNUSED, 0);
+        worker_status[idx] = (od.0, STATUS::Unused, 0);
     }
 
     let id = {
         worker_status
             .iter()
-            .filter(|f| f.1 == STATUS::UNUSED)
-            .collect::<Vec<&(WORKER, STATUS, TIMESTAMP)>>()
+            .filter(|f| f.1 == STATUS::Unused)
+            .collect::<Vec<&(Worker, STATUS, Timestamp)>>()
             .pop()
             .copied()
     };
@@ -59,7 +59,7 @@ async fn get_id() -> Result<Json<Response>, ()> {
         Some(idv) => {
             let idx = worker_status.iter().position(|f| f == &idv).unwrap();
 
-            worker_status[idx] = (idv.0, STATUS::INUSE, time);
+            worker_status[idx] = (idv.0, STATUS::Inuse, time);
             Ok(web::Json(Response {
                 id: idx as u16,
                 ts: time,
@@ -74,7 +74,7 @@ async fn main() -> std::io::Result<()> {
     {
         let mut worker_status = WORKER_STATUS.lock().unwrap();
         for worker_id in u16::MIN..u16::MAX {
-            (*worker_status).push((worker_id, STATUS::UNUSED, 0));
+            (*worker_status).push((worker_id, STATUS::Unused, 0));
         }
     }
 
