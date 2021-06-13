@@ -7,7 +7,7 @@
 
 use actix_web::web::Json;
 use actix_web::{web, App, HttpServer};
-use dotenv::{dotenv, Error};
+use dotenv::{dotenv};
 use once_cell::sync::Lazy;
 use serde::Serialize;
 use std::env;
